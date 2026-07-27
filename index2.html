@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>China's Chip Ecosystem: Ownership & State Capital</title>
+<style>
+  :root{
+    --nat:#b71c1c; --loc:#b26a00; --corp:#1565c0; --ink:#1a2333; --muted:#5b6779;
+    --bg:#f4f6f9; --card:#fff; --line:#dde3ec;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; background:var(--bg); color:var(--ink); padding:18px;}
+  header{max-width:1400px; margin:0 auto 12px;}
+  h1{font-size:21px;}
+  .sub{color:var(--muted); font-size:13px; margin-top:3px;}
+  .layout{max-width:1400px; margin:0 auto; display:flex; gap:14px; align-items:flex-start;}
+  .mapcard{flex:1 1 auto; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px; position:relative; overflow-x:auto;}
+  svg{min-width:1100px; width:100%; height:auto; display:block;}
+  .panel{flex:0 0 340px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:15px; max-height:760px; overflow-y:auto;}
+  .panel h2{font-size:15.5px; margin-bottom:4px;}
+  .panel .hint{font-size:12.5px; color:var(--muted); line-height:1.55;}
+  .stake{font-size:11.5px; line-height:1.45; padding:6px 8px; border-left:3px solid #ccc; margin-bottom:6px; background:#fafbfd; border-radius:0 6px 6px 0;}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 16px; padding:6px 10px 2px; font-size:12px; align-items:center;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .sw{width:22px; height:0; border-top:3px solid; border-radius:2px;}
+  .sw.dash{border-top-style:dashed;}
+  path.own{fill:none; stroke-width:1.8; opacity:.7; cursor:pointer; transition:opacity .15s, stroke-width .15s;}
+  path.own.dim{opacity:.06;}
+  path.own.hot{opacity:1; stroke-width:3;}
+  path.ownhit{fill:none; stroke:transparent; stroke-width:12; cursor:pointer;}
+  g.node{cursor:pointer;}
+  g.node.dim{opacity:.25;}
+  g.node rect{transition:filter .15s;}
+  g.node:hover rect{filter:brightness(1.12);}
+  text.nl{font-size:11.5px; font-weight:700; fill:#fff; text-anchor:middle; pointer-events:none;}
+  text.ns{font-size:8.5px; font-weight:500; fill:#ffffffcc; text-anchor:middle; pointer-events:none;}
+  text.pct{font-size:9px; font-weight:700; paint-order:stroke; stroke:#fff; stroke-width:2.5px; text-anchor:middle; pointer-events:none;}
+  text.band{font-size:10px; font-weight:700; fill:#9aa7b8; letter-spacing:1px;}
+  text.cityband{font-size:10.5px; font-weight:700; fill:#7b8798; text-anchor:middle; letter-spacing:.5px;}
+  .tooltip{position:absolute; pointer-events:none; background:#101828ee; color:#fff; font-size:12px; line-height:1.45; padding:8px 11px; border-radius:8px; max-width:300px; display:none; z-index:10;}
+  footer{max-width:1400px; margin:12px auto 0; font-size:11px; color:var(--muted); line-height:1.5;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Who Owns China's Chip Push: State Capital and Ownership Stakes</h1>
+  <div class="sub">National funds (top) → local state capital (middle) → firms (bottom, grouped by cluster). Edge labels show stakes where disclosed; hover edges for detail, click nodes for full ownership notes. Compiled July 2026.</div>
+</header>
+<div class="layout">
+  <div class="mapcard">
+    <div class="legend">
+      <span><span class="sw" style="border-color:var(--nat)"></span>National funds / central SOEs</span>
+      <span><span class="sw" style="border-color:var(--loc)"></span>Local state capital (province · city · district)</span>
+      <span><span class="sw" style="border-color:var(--corp)"></span>Corporate / inter-firm stakes</span>
+      <span><span class="sw dash" style="border-color:var(--nat)"></span>Policy loan / IP-as-equity (non-standard)</span>
+    </div>
+    <svg id="net" viewBox="0 0 1720 720" aria-label="Ownership network"></svg>
+    <div class="tooltip" id="tip"></div>
+  </div>
+  <div class="panel" id="panel">
+    <h2>How to read this</h2>
+    <p class="hint" style="margin-top:6px">
+      Three tiers of capital run through China's chip ecosystem. The <b>Big Fund</b> (国家集成电路产业投资基金, phases I–III) takes minority stakes almost everywhere. <b>Local state capital</b> does the heavy lifting — and its form varies by city: Beijing uses holding companies (BEHC) and a zone fund (E-Town); Shanghai uses venture vehicles; Shenzhen uses a municipal investment group as a <b>legal firewall</b> around Huawei-linked fabs it owns outright; Hubei runs a three-tier province/city/district rescue architecture; Hefei co-founds firms with fabless partners.
+    </p>
+    <p class="hint" style="margin-top:8px">
+      Patterns worth noting: firms with <b>no controlling shareholder</b> (SMIC, YMTC, CXMT) — deliberate "national team" structures; <b>equity as rescue</b> (湖北长晟's RMB 30B YMTC recapitalization, 2023); <b>equity as separation</b> (YMTC selling 39% of XMC to district capital to clear two IPO paths, 2026); and <b>IP as equity</b> (CAS institutes capitalizing Gopptix with R&D intangibles).
+    </p>
+    <p class="hint" style="margin-top:8px"><b>Click any node</b> for its ownership detail.</p>
+  </div>
+</div>
+<footer>
+  Stakes marked ~ are reported/estimated or simplified (many holdings sit behind layered vehicles; listed-company registers shift). Key disclosed figures: SMIC Beijing 51/24.51/24.49 (SMIC/E-Town/Big Fund II); 湖北长晟 ~26.5% of YMTC (itself 40/40/20 Hubei IC fund / Optics Valley Financial Holdings / Yangtze Industrial Group); XMC 39% sale to 光谷半导体产投 (2026); Yuliangsheng 50/50 Shanghai Sci-Tech VC / SiCarrier; NAURA ~43% Beijing SASAC-affiliated. Sources: company prospectuses and filings (CXMT STAR IPO; SMIC; NAURA; Kaifa), Securities Times, NBD, 21jingji, Qixin/Qichamao registries, US Commerce Entity List documentation, FT, eeNews.
+</footer>
+
+<script>
+const TIERC = {nat:'#b71c1c', loc:'#b26a00', firm:'#12335f', firm2:'#37474f'};
+
+const NODES = [
+ // national tier (y=52)
+ {id:'bigfund', l:'Big Fund I/II/III', s:'国家集成电路产业投资基金', tier:'nat', x:760, y:52, w:150,
+  note:'The national IC investment fund (phases I: 2014 RMB 138.7B; II: 2019 RMB 204B; III: 2024 RMB 344B). Takes minority, patient stakes across the chain — foundry (SMIC, Hua Hong), memory (YMTC, CXMT), OSAT (Hefei Payton), equipment funds.'},
+ {id:'cdb', l:'China Development Bank', s:'国开行 · policy finance', tier:'nat', x:1100, y:52, w:170,
+  note:'Policy lender rather than shareholder: the RMB 10B “Rise of Central China” soft loan (2005) capitalized 湖北科投, the vehicle that built XMC and later helped rescue YMTC. Also attached a technology-finance facility to Shenzhen’s Guangming science city.'},
+ {id:'cec', l:'CEC / Great Wall', s:'中国电子 · central SOE', tier:'nat', x:930, y:52, w:130,
+  note:'Central-SOE chain into memory packaging: CEC/China Great Wall sits atop Shenzhen Kaifa 深科技 (~), which owns Payton — the memory OSAT with plants in Shenzhen and beside CXMT in Hefei.'},
+ {id:'cas', l:'CAS institutes', s:'中科院 (ICT, Changchun Optics, SIOM)', tier:'nat', x:250, y:52, w:150,
+  note:'Chinese Academy of Sciences institutes as shareholders: the Institute of Computing Technology seeded Cambricon; Changchun Optics and SIOM invested R&D IP as equity in Gopptix — a first in domestic tech-transfer practice, some IP inherited from national projects.'},
+
+ {id:'tsinghua', l:'Tsinghua system 清华系', s:'university SOE holdings', tier:'nat', x:440, y:52, w:150,
+  note:'University-affiliated state capital: Tsinghua Holdings-lineage vehicles hold the controlling interest in CMP-equipment maker Hwatsing 华海清科 (~). Tsinghua was also the origin of Unigroup — the two Beijing university systems (Tsinghua, CAS) each seeded a slice of the toolchain.'},
+ {id:'unigroup', l:'Unigroup (reorg.) 紫光', s:'Zhilu/Jianguang consortium', tier:'nat', x:1450, y:52, w:150,
+  note:'Tsinghua Unigroup — original investor behind YMTC and the UniIC DRAM design house — collapsed in 2021 and was reorganized under the Zhilu Capital / Jianguang (智路建广) consortium. Its listed arm Unigroup Guoxin 紫光国微 parents Xi’an UniIC.'},
+
+ // local state capital tier (y=170)
+ {id:'behc', l:'BEHC 北京电控', s:'Beijing SASAC holding', tier:'loc', x:165, y:170, w:135,
+  note:'Beijing Electronics Holding: municipal holding company over BOE, Sevenstar (NAURA lineage) and YDME. Created Beidian Integration, the SPV pooling YDME + BOE + E-Town capital for the RMB 33B 12-inch specialty fab.'},
+ {id:'etown', l:'E-Town Capital 亦庄国投', s:'Yizhuang zone fund', tier:'loc', x:330, y:170, w:150,
+  note:'The Beijing ETDZ investment platform: 24.51% of SMIC Beijing, capital in Beidian Integration, anchor investor in Gopptix and equipment startups. The financing engine of the Yizhuang cluster.'},
+ {id:'shstate', l:'Shanghai state capital', s:'联和投资 · 上海科创投', tier:'loc', x:630, y:170, w:160,
+  note:'Shanghai’s vehicles: Lianhe Investment historically controls Hua Hong Group; Shanghai Science & Technology Venture Capital holds ~15% of AMEC as largest shareholder (~) and 50% of litho startup Yuliangsheng (with SiCarrier).'},
+ {id:'szmajor', l:'SZ Major Industry Inv. Group', s:'深圳重大产业投资集团 (SZ SASAC)', tier:'loc', x:910, y:170, w:200,
+  note:'Shenzhen’s legal firewall: wholly owns SiCarrier and owns SwaySure, PXW and PST — the fabs Huawei is believed to direct but cannot own under Entity-List sanctions. A 60-30-10 municipal/guidance-fund/district vehicle also holds the Guangming science-city instruments — the same asset family funds the open-science and closed supply-chain layers at once.'},
+ {id:'hubeiprov', l:'湖北长晟 (Hubei tier)', s:'湖北科投 · 长江产投 vehicles', tier:'loc', x:1140, y:170, w:160,
+  note:'Hubei’s three-tier architecture concentrated in 湖北长晟 — owned 40/40/20 by the Hubei IC fund, Optics Valley Financial Holdings, and Yangtze Industrial Group. Subscribed RMB 30.07B in YMTC’s 2023 recapitalization to become largest shareholder (~26.5%); 湖北长晟三期 holds 49.81% of the Phase III company.'},
+ {id:'guanggu', l:'光谷金控 → 光谷半导体产投', s:'East Lake HTZ district SOE', tier:'loc', x:1310, y:170, w:180,
+  note:'District-level state capital of Wuhan’s Optics Valley. Its 光谷半导体产投 vehicle (founded 2023) is buying 39% of XMC from YMTC (2026), taking control at 47.9% — clearing separate IPO paths. 光谷金控 also holds 40% of 湖北长晟.'},
+ {id:'hefeistate', l:'Hefei state capital', s:'合肥产投 · ETDZ funds', tier:'loc', x:1485, y:170, w:140,
+  note:'The “Hefei model” operator: 合肥产投 co-founded CXMT with GigaDevice (2016 “506 project”, planned RMB 150B) — anchor fab, majority state capital early, minority technology partner. ETDZ funds co-invested in Hefei Payton. Post-IPO CXMT has no controlling shareholder.'},
+
+ // firms (y=430/560), grouped by city
+ {id:'naura', l:'NAURA 北方华创', s:'equipment', tier:'firm', x:150, y:430, w:130,
+  note:'China’s largest chip-equipment maker. ~43% held by Beijing SASAC-affiliated entities (Sevenstar/BEHC lineage + 京国瑞 fund) (~). Formed from the merger of Sevenstar Electronics and North Microelectronics.'},
+ {id:'smicbj', l:'SMIC Beijing', s:'foundry JV', tier:'firm', x:305, y:430, w:120,
+  note:'The cleanest disclosed split in the ecosystem: SMIC 51% / E-Town Capital 24.51% / Big Fund II 24.49%. RMB 49.7B mature-node expansion.'},
+ {id:'gopptix', l:'Gopptix 国望光学', s:'litho optics', tier:'firm', x:95, y:560, w:120,
+  note:'RMB 3B registered capital: E-Town Capital + CAS optics institutes — which contributed R&D IP as equity, a first in domestic tech-transfer practice.'},
+ {id:'beidian', l:'Beidian Integration 北电集成', s:'12" specialty fab SPV', tier:'firm', x:245, y:560, w:170,
+  note:'BEHC’s special-purpose vehicle consolidating fragmented Yizhuang fab assets: capital and expertise pooled from YDME, BOE (10%), and E-Town Capital, with national-fund participation (~). RMB 33B, 28–55nm HV/mixed-signal/RF-CMOS.'},
+ {id:'giga', l:'GigaDevice 兆易创新', s:'fabless design', tier:'firm', x:420, y:560, w:130,
+  note:'Listed fabless designer (NOR flash/MCU). Co-founded CXMT with Hefei state capital in 2016; founder Zhu Yiming led both. Retains a design-partnership and modest residual stake (~).'},
+
+ {id:'cambricon', l:'Cambricon 寒武纪', s:'AI-chip design (STAR)', tier:'firm', x:455, y:430, w:120,
+  note:'AI accelerator designer spun out of the CAS Institute of Computing Technology, which seeded and funded it (brothers Chen Yunji/Chen Tianshi came from ICT). STAR-listed 2020; the flagship domestic answer to restricted Nvidia parts, alongside Huawei’s Ascend.'},
+ {id:'hwatsing', l:'Hwatsing 华海清科', s:'CMP equipment (Tianjin)', tier:'firm', x:380, y:495, w:120,
+  note:'China’s chemical-mechanical polishing (CMP) equipment leader, HQ Tianjin. Tsinghua-system lineage; partially state-owned; STAR-listed. Supplies SMIC, YMTC, CXMT, Hua Hong — one of the few single-source domestic tool categories.'},
+ {id:'uniic', l:'Xi’an UniIC 紫光国芯', s:'DRAM design', tier:'firm', x:1650, y:430, w:130,
+  note:'DRAM design house in Xi’an’s Gaoxin zone — the Qimonda-lineage team: standalone and embedded DRAM, memory controllers, custom ASICs. Parented by listed Unigroup Guoxin 紫光国微 under the reorganized Unigroup. (Xi’an’s big fabs — Samsung NAND, Micron packaging — are foreign-owned and sit outside this state-capital web.)'},
+
+ {id:'smic', l:'SMIC 中芯国际', s:'foundry (HK/STAR listed)', tier:'firm', x:620, y:430, w:130,
+  note:'No controlling shareholder. Big Fund holds ~10%+ via vehicles (鑫芯香港 etc.) alongside Datang Telecom (central SOE, ~14%) (~). SMIC in turn holds 51% of SMIC Beijing. Advanced capacity reportedly allocated to Huawei first.'},
+ {id:'huahong', l:'Hua Hong 华虹', s:'foundry', tier:'firm', x:753, y:430, w:110,
+  note:'Shanghai state capital (Hua Hong Group under 联和投资) controls; Big Fund holds stakes at group and Wuxi-fab level. China’s No.2 foundry.'},
+ {id:'amec', l:'AMEC 中微', s:'etch equipment', tier:'firm', x:605, y:560, w:110,
+  note:'STAR-listed etch leader. Largest shareholder: Shanghai Science & Technology Venture Capital (~15%) (~) — a state VC rather than a holding company; founder Gerald Yin retains management control.'},
+ {id:'yuliang', l:'Yuliangsheng 宇量昇', s:'immersion DUV litho', tier:'firm', x:740, y:560, w:130,
+  note:'The ASML-workaround vehicle: 50% Shanghai Sci-Tech Venture Capital / 50% SiCarrier. Absorbed SMEE’s front-end litho team; SMIC reportedly began testing its immersion DUV scanner Sep 2025.'},
+
+ {id:'sicarrier', l:'SiCarrier 新凯来', s:'chip tools', tier:'firm', x:875, y:430, w:120,
+  note:'Wholly owned by Shenzhen Major Industry Investment Group; US Commerce lists alias “Huawei Starlight Engineering Department.” Holds 50% of Yuliangsheng (litho, Shanghai). Tool halls sit skybridge-distance from the Huawei-operated Guanlan fab.'},
+ {id:'swaysure', l:'SwaySure 昇维旭', s:'DRAM startup', tier:'firm', x:1015, y:430, w:110,
+  note:'Shenzhen SASAC-owned memory startup (RMB 5B registered capital); one fab reportedly runs exclusively on SiCarrier tools. Huawei supplies engineering direction and demand; the city supplies the balance sheet and the legal firewall.'},
+ {id:'pxwpst', l:'PXW 鹏芯微 / PST 鹏新旭', s:'logic fabs', tier:'firm', x:1018, y:560, w:160,
+  note:'Municipally owned foundries under Shenzhen Major Industry Investment Group — PXW (28/20nm, Longgang-registered, run by a former Huawei exec; identified with the Guanlan 7nm site), PST (40/28nm, Pingshan, beside SMIC Shenzhen).'},
+ {id:'kaifa', l:'Kaifa 深科技 → Payton 沛顿', s:'EMS + memory OSAT', tier:'firm', x:870, y:560, w:120,
+  note:'Kaifa (central-SOE controlled via CEC/Great Wall (~)) bought Kingston-origin Payton for US$111M in 2015. Payton Shenzhen in turn parents Hefei Payton — the OSAT loop across the two memory geographies.'},
+
+ {id:'ymtc', l:'YMTC 长江存储', s:'3D NAND IDM', tier:'firm', x:1150, y:430, w:130,
+  note:'No controlling shareholder — a deliberate “chip national team”: 湖北长晟 ~26.5% (largest), Big Fund I & II, Wuhan Optics Valley Industrial Investment, Yangtze Industrial Group, state-bank platforms. Registered capital jumped RMB 56.3B → 105.3B in the 2023 rescue. IPO tutoring since May 2026.'},
+ {id:'xmc', l:'XMC 武汉新芯', s:'NOR flash fab', tier:'firm', x:1300, y:560, w:120,
+  note:'Founded 2006 with RMB 10.7B of three-tier government money under SMIC management. YMTC held 68.2%; the 2026 sale of 39% to 光谷半导体产投 shifts control to district state capital (47.9%) — read as clearing separate IPO paths.'},
+
+ {id:'cxmt', l:'CXMT 长鑫科技', s:'DRAM IDM (STAR listed)', tier:'firm', x:1480, y:430, w:130,
+  note:'Listed July 2026 (RMB 57.9B raise; ~RMB 3.3T market cap at debut). No controlling shareholder: Hefei state capital vehicles, Big Fund II, GigaDevice, and a broad pre-IPO register. Born from the 2016 合肥产投 × GigaDevice “506 project.”'},
+ {id:'hfpayton', l:'Hefei Payton 沛顿存储', s:'memory OSAT', tier:'firm', x:1440, y:560, w:140,
+  note:'RMB 3.06B registered capital (Oct 2020): Payton Shenzhen (Kaifa) + Big Fund II + Hefei ETDZ funds. Across the street from CXMT; taking ~85% of Kaifa’s 2026 packaging expansion.'}
+];
+
+const EDGES = [
+ // national (red)
+ {f:'bigfund', t:'smic',    ty:'nat', pct:'~10%+', d:'Big Fund I/II stakes via vehicles (鑫芯香港 etc.) (~); alongside Datang Telecom (central SOE, ~14%).'},
+ {f:'bigfund', t:'smicbj',  ty:'nat', pct:'24.49%', d:'Big Fund II — disclosed JV split with SMIC (51%) and E-Town (24.51%).'},
+ {f:'bigfund', t:'huahong', ty:'nat', pct:'', d:'Big Fund stakes at Hua Hong Group and Hua Hong Wuxi levels.'},
+ {f:'bigfund', t:'ymtc',    ty:'nat', pct:'', d:'Big Fund I in the 2019 angel round; Big Fund II in the 2023 A round/recapitalization.'},
+ {f:'bigfund', t:'cxmt',    ty:'nat', pct:'', d:'Big Fund II pre-IPO stake in ChangXin.'},
+ {f:'bigfund', t:'hfpayton',ty:'nat', pct:'', d:'Big Fund II co-invested in Hefei Payton (2020) with Kaifa/Payton and ETDZ funds.'},
+ {f:'bigfund', t:'beidian', ty:'nat', pct:'~', d:'National-fund participation reported in the RMB 33B Yizhuang 12-inch project (~).'},
+ {f:'cdb',     t:'hubeiprov',ty:'nat', dash:1, pct:'¥10B loan', d:'2005 “Rise of Central China” soft loan capitalized 湖北科投 — policy debt, not equity, at the root of the Hubei architecture.'},
+ {f:'cec',     t:'kaifa',   ty:'nat', pct:'control (~)', d:'Kaifa 深科技 sits under the CEC/China Great Wall central-SOE system (~).'},
+ {f:'cas',     t:'gopptix', ty:'nat', dash:1, pct:'IP-as-equity', d:'Changchun Optics + SIOM invested R&D intangibles as registered capital — a first in domestic tech transfer.'},
+
+ {f:'cas',     t:'cambricon',ty:'nat', pct:'founding (~)', d:'CAS Institute of Computing Technology seeded Cambricon and remained an anchor shareholder through its 2020 STAR listing (~).'},
+ {f:'tsinghua',t:'hwatsing', ty:'nat', pct:'control (~)', d:'Tsinghua-system vehicles as controlling/major shareholder of the CMP-tool maker (~).'},
+ {f:'unigroup',t:'uniic',    ty:'nat', pct:'parent', d:'Via listed Unigroup Guoxin 紫光国微 — the design-house remnant of Unigroup’s memory empire after the 2021 collapse (YMTC went to Hubei state capital instead).'},
+
+ // local state capital (amber)
+ {f:'behc',    t:'naura',   ty:'loc', pct:'~43%', d:'Beijing SASAC-affiliated entities (Sevenstar/BEHC lineage + 京国瑞) hold ~43% (~).'},
+ {f:'behc',    t:'beidian', ty:'loc', pct:'SPV', d:'BEHC created Beidian Integration, pooling YDME + BOE (10%) + E-Town capital under one build-and-operate mandate.'},
+ {f:'etown',   t:'smicbj',  ty:'loc', pct:'24.51%', d:'E-Town Capital’s disclosed stake in the SMIC Beijing JV.'},
+ {f:'etown',   t:'beidian', ty:'loc', pct:'', d:'E-Town capital pooled into the Beidian SPV.'},
+ {f:'etown',   t:'gopptix', ty:'loc', pct:'anchor', d:'E-Town Capital anchor investment alongside CAS institutes.'},
+ {f:'shstate', t:'huahong', ty:'loc', pct:'control', d:'Hua Hong Group under Shanghai 联和投资 — municipal control of the No.2 foundry.'},
+ {f:'shstate', t:'amec',    ty:'loc', pct:'~15%', d:'Shanghai Science & Technology Venture Capital as largest shareholder (~); management stays with founder Gerald Yin.'},
+ {f:'shstate', t:'yuliang', ty:'loc', pct:'50%', d:'Shanghai Sci-Tech Venture Capital holds half of the immersion-DUV startup — the other half is SiCarrier.'},
+ {f:'szmajor', t:'sicarrier',ty:'loc', pct:'100%', d:'Wholly owned by Shenzhen Major Industry Investment Group — the registry answer; the industry answer is the Commerce Department’s alias list.'},
+ {f:'szmajor', t:'swaysure',ty:'loc', pct:'', d:'Shenzhen SASAC-owned DRAM startup (RMB 5B registered capital).'},
+ {f:'szmajor', t:'pxwpst',  ty:'loc', pct:'', d:'Municipal ownership of the Huawei-linked foundries — the legal firewall that sanctions generated.'},
+ {f:'guanggu', t:'hubeiprov',ty:'loc', pct:'40%', d:'光谷金控 holds 40% of 湖北长晟 (with the Hubei IC fund 40% and Yangtze Industrial Group 20%).'},
+ {f:'hubeiprov',t:'ymtc',   ty:'loc', pct:'~26.5%', d:'湖北长晟 became YMTC’s largest shareholder by subscribing RMB 30.07B in the Feb 2023 recapitalization; 湖北长晟三期 holds 49.81% of the Phase III company.'},
+ {f:'guanggu', t:'xmc',     ty:'loc', pct:'47.9%', d:'光谷半导体产投/光新启航 buying 39% from YMTC (2026) → control at 47.9%.'},
+ {f:'hefeistate',t:'cxmt',  ty:'loc', pct:'founding', d:'合肥产投 co-founded CXMT (2016 “506 project”); post-IPO the register is broad with no controlling shareholder.'},
+ {f:'hefeistate',t:'hfpayton',ty:'loc', pct:'', d:'Hefei ETDZ funds co-invested in the packaging base beside CXMT.'},
+
+ // corporate / inter-firm (blue)
+ {f:'smic',    t:'smicbj',  ty:'corp', pct:'51%', d:'SMIC majority in the Beijing JV.'},
+ {f:'sicarrier',t:'yuliang',ty:'corp', pct:'50%', d:'SiCarrier’s lithography arm — Shenzhen state tools money meets Shanghai state VC.'},
+ {f:'giga',    t:'cxmt',    ty:'corp', pct:'co-founder', d:'GigaDevice co-founded CXMT and remains design partner; modest residual stake (~).'},
+ {f:'ymtc',    t:'xmc',     ty:'corp', pct:'29.2%', d:'Down from 68.2% after the 39% sale to Optics Valley state capital (Jun 2026) — equity as corporate separation ahead of dual IPOs.'},
+ {f:'kaifa',   t:'hfpayton',ty:'corp', pct:'parent', d:'Via Payton Shenzhen (acquired from Kingston interests for US$111M, 2015). RMB 1.47B two-site expansion announced May 2026, ~85% of new capacity to Hefei.'}
+];
+
+const EC = {nat:'#b71c1c', loc:'#b26a00', corp:'#1565c0'};
+
+// ---------- render ----------
+const svg = document.getElementById('net');
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||svg).appendChild(e);return e;}
+
+// tier bands + city bands
+el('text',{class:'band',x:16,y:40}).textContent='NATIONAL FUNDS & CENTRAL SOEs';
+el('text',{class:'band',x:16,y:158}).textContent='LOCAL STATE CAPITAL';
+el('text',{class:'band',x:16,y:392}).textContent='FIRMS';
+const bands=[['BEIJING · TIANJIN',255],['SHANGHAI',680],['SHENZHEN · DONGGUAN',945],['WUHAN',1215],['HEFEI',1460],['XI’AN',1650]];
+bands.forEach(b=>{ el('text',{class:'cityband',x:b[1],y:668}).textContent=b[0]; });
+
+const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));
+const NH=46;
+NODES.forEach(n=>{ n.h=NH; });
+
+// edges under nodes
+const gE=el('g',{});
+const tip=document.getElementById('tip');
+const edgeEls=[];
+EDGES.forEach(E=>{
+  const a=byId[E.f], b=byId[E.t];
+  const x1=a.x, y1=a.y+a.h/2, x2=b.x, y2=b.y-b.h/2;
+  const dy=Math.max(40,(y2-y1)*0.45);
+  const d=`M${x1},${y1} C${x1},${y1+dy} ${x2},${y2-dy} ${x2},${y2}`;
+  const p=el('path',{d, class:'own', stroke:EC[E.ty], 'stroke-dasharray':E.dash?'5 4':'none'}, gE);
+  const hit=el('path',{d, class:'ownhit'}, gE);
+  edgeEls.push({p,hit,E});
+  if(E.pct){
+    // cubic midpoint at t=.5
+    const mx=(x1+3*x1+3*x2+x2)/8, my=(y1+3*(y1+dy)+3*(y2-dy)+y2)/8;
+    const t=el('text',{class:'pct', x:mx, y:my+3, fill:EC[E.ty]});
+    t.textContent=E.pct;
+  }
+  const show=(ev)=>{ tip.style.display='block';
+    tip.innerHTML='<b>'+a.l+' → '+b.l+'</b><br>'+E.d;
+    const r=svg.parentElement.getBoundingClientRect();
+    tip.style.left=Math.min(ev.clientX-r.left+14,r.width-310)+'px'; tip.style.top=(ev.clientY-r.top+10)+'px';
+    p.classList.add('hot'); };
+  const hide=()=>{ tip.style.display='none'; p.classList.remove('hot'); };
+  hit.addEventListener('mousemove',show); hit.addEventListener('mouseleave',hide);
+});
+
+// nodes
+const nodeEls={};
+NODES.forEach(n=>{
+  const g=el('g',{class:'node'});
+  const fill = n.tier==='nat'? TIERC.nat : n.tier==='loc'? TIERC.loc : TIERC.firm;
+  el('rect',{x:n.x-n.w/2, y:n.y-n.h/2, width:n.w, height:n.h, rx:9, fill, stroke:'#fff','stroke-width':'2'}, g);
+  const t1=el('text',{class:'nl', x:n.x, y:n.y-2}, g); t1.textContent=n.l;
+  const t2=el('text',{class:'ns', x:n.x, y:n.y+13}, g); t2.textContent=n.s;
+  g.addEventListener('click',()=>select(n.id));
+  g.addEventListener('mouseenter',()=>focus(n.id,true));
+  g.addEventListener('mouseleave',()=>focus(null,false));
+  nodeEls[n.id]=g;
+});
+
+let selected=null;
+function focus(id,on){
+  const active=on?id:selected;
+  edgeEls.forEach(({p,E})=>{
+    if(!active){p.classList.remove('dim','hot');return;}
+    const touch=E.f===active||E.t===active;
+    p.classList.toggle('dim',!touch); p.classList.toggle('hot',touch&&on);
+  });
+  for(const nid in nodeEls){
+    if(!active){nodeEls[nid].classList.remove('dim');continue;}
+    const touches=nid===active||EDGES.some(E=>(E.f===active&&E.t===nid)||(E.t===active&&E.f===nid));
+    nodeEls[nid].classList.toggle('dim',!touches);
+  }
+}
+const HOME=document.getElementById('panel').innerHTML;
+function select(id){
+  selected=(selected===id)?null:id;
+  focus(null,false);
+  const panel=document.getElementById('panel');
+  if(!selected){panel.innerHTML=HOME;return;}
+  const n=byId[selected];
+  panel.innerHTML='';
+  const h=document.createElement('h2'); h.textContent=n.l; panel.appendChild(h);
+  const s=document.createElement('div'); s.className='hint'; s.textContent=n.s; s.style.marginBottom='8px'; panel.appendChild(s);
+  const note=document.createElement('p'); note.className='hint'; note.textContent=n.note; note.style.marginBottom='12px'; panel.appendChild(note);
+  const owns=EDGES.filter(E=>E.f===selected), owned=EDGES.filter(E=>E.t===selected);
+  if(owned.length){
+    const lh=document.createElement('div'); lh.className='hint'; lh.innerHTML='<b>Owned / funded by:</b>'; panel.appendChild(lh);
+    owned.forEach(E=>{ const d=document.createElement('div'); d.className='stake'; d.style.borderLeftColor=EC[E.ty];
+      d.innerHTML='<b>'+byId[E.f].l+(E.pct?' · '+E.pct:'')+'</b> — '+E.d; panel.appendChild(d); });
+  }
+  if(owns.length){
+    const lh=document.createElement('div'); lh.className='hint'; lh.innerHTML='<b>Holds stakes in:</b>'; lh.style.marginTop='8px'; panel.appendChild(lh);
+    owns.forEach(E=>{ const d=document.createElement('div'); d.className='stake'; d.style.borderLeftColor=EC[E.ty];
+      d.innerHTML='<b>'+byId[E.t].l+(E.pct?' · '+E.pct:'')+'</b> — '+E.d; panel.appendChild(d); });
+  }
+  const back=document.createElement('p'); back.className='hint'; back.style.marginTop='10px';
+  back.innerHTML='<a href="#" onclick="window._sel(null);return false;">← back to overview</a>'; panel.appendChild(back);
+}
+window._sel=(v)=>{selected=v?v:null; select(selected||'__none__'); if(!v){document.getElementById('panel').innerHTML=HOME; selected=null; focus(null,false);}};
+</script>
+</body>
+</html>
